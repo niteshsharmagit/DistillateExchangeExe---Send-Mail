@@ -34,7 +34,7 @@ namespace DistillateExchangeExe___Send_Mail
                 string AdminIdQuery = "select Top 1 Email from tblUser Where Active = 1 and UserTypeId = 1";
                 SqlCommand AdminIdcmd = new SqlCommand(AdminIdQuery, con);
                 SqlDataReader AdminIdReader = AdminIdcmd.ExecuteReader();
-                string AdminId = "";
+                string AdminId = ""; //
 
                 while (AdminIdReader.Read())
                 {
