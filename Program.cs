@@ -23,8 +23,8 @@ namespace DistillateExchangeExe___Send_Mail
                 SqlConnection con = new SqlConnection("server=3.20.32.190; database=DistillerExchange; user=sa; password=lms123; Persist Security Info=False; Connect Timeout=25000; MultipleActiveResultSets=True;");
                 con.Open();
 
-                //FilePath = @"E:\DotNet\DXLab\EXE";
-                FilePath = @"C:\Users\Nitesh Sharma\source\repos\DistillateExchangeExe - Send Mail";
+                FilePath = @"C:\DxLab - EXE\DistillateExchangeExe - Send Mail"; 
+                //FilePath = @"C:\Users\Nitesh Sharma\source\repos\DistillateExchangeExe - Send Mail";
 
                 if (!File.Exists(FilePath + "\\" + "log.txt"))
                     File.Create(FilePath + "\\" + "log.txt");
@@ -41,7 +41,7 @@ namespace DistillateExchangeExe___Send_Mail
                     AdminId = AdminIdReader["Email"].ToString();
                 }
 
-                SqlCommand cmd = new SqlCommand("select UserId , Email, LicenseExpiry from tblUser Where Active = 1 and UserTypeId = 2", con);
+                SqlCommand cmd = new SqlCommand("select UserId , Email, LicenseExpiry from tblUser Where Active = 1 and UserTypeId = 2 and Status = 2", con);
 
                 using (SqlDataReader oReader = cmd.ExecuteReader())
                 {
@@ -56,13 +56,21 @@ namespace DistillateExchangeExe___Send_Mail
                             SqlDataReader DateDiffReader = obj.GetDateDifference(con, LicenseExpiry);
                             while (DateDiffReader.Read())
                             {
-                                if ((int)DateDiffReader["DateDiff"] < 30)
+                                if (AdminIdReader.HasRows == true)
                                 {
-                                    if (AdminIdReader.HasRows == true)
+                                    if ((int)DateDiffReader["DateDiff"] < 31 && (int)DateDiffReader["DateDiff"] > 0)
                                     {
-                                      isSent = obj.SendMail("distillate.lms@gmail.com", oReader["Email"].ToString(), "odzrecwvlwkeekzu", "License Expiration Reminder", "Your license registered with DistillateEx will expire on " + LicenseExpiry + ".", AdminId);                                         
+                                            isSent = obj.SendMail("distillate.lms@gmail.com", oReader["Email"].ToString(), "odzrecwvlwkeekzu", "License Expiration Reminder", "Your license registered with DistillateEx will expire on " + LicenseExpiry + ".", AdminId);
                                     }
-                                }
+                                    else if ((int)DateDiffReader["DateDiff"] == 0)
+                                    {
+                                        isSent = obj.SendMail("distillate.lms@gmail.com", oReader["Email"].ToString(), "odzrecwvlwkeekzu", "License Expiration Reminder", "Your license registered with DistillateEx will expire today.", AdminId);
+                                    }
+                                    else if ((int)DateDiffReader["DateDiff"] < 0)
+                                    {
+                                        isSent = obj.SendMail("distillate.lms@gmail.com", oReader["Email"].ToString(), "odzrecwvlwkeekzu", "License Expiration Reminder", "Your license registered with DistillateEx has expired.", AdminId);
+                                    }
+                                }                                
                             }                         
                         }
                     }
