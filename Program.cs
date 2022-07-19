@@ -41,7 +41,7 @@ namespace DistillateExchangeExe___Send_Mail
                     AdminId = AdminIdReader["Email"].ToString();
                 }
 
-                SqlCommand cmd = new SqlCommand("select UserId , Email, LicenseExpiry from tblUser Where Active = 1 and UserTypeId = 2 and Status = 2", con);
+                SqlCommand cmd = new SqlCommand("select UserId, FirstName, Email, LicenseExpiry from tblUser Where Active = 1 and UserTypeId = 2 and Status = 2", con);
 
                 using (SqlDataReader oReader = cmd.ExecuteReader())
                 {
@@ -52,6 +52,7 @@ namespace DistillateExchangeExe___Send_Mail
                         while (oReader.Read())
                         {
                             DateTime LicenseExpiry = (DateTime)oReader["LicenseExpiry"];
+                            string Name = oReader["FirstName"].ToString();
 
                             SqlDataReader DateDiffReader = obj.GetDateDifference(con, LicenseExpiry);
                             while (DateDiffReader.Read())
@@ -60,15 +61,15 @@ namespace DistillateExchangeExe___Send_Mail
                                 {
                                     if ((int)DateDiffReader["DateDiff"] < 31 && (int)DateDiffReader["DateDiff"] > 0)
                                     {
-                                            isSent = obj.SendMail("distillate.lms@gmail.com", oReader["Email"].ToString(), "odzrecwvlwkeekzu", "License Expiration Reminder", "Your license registered with DistillateEx will expire on " + LicenseExpiry + ".", AdminId);
+                                            isSent = obj.SendMail("distillate.lms@gmail.com", oReader["Email"].ToString(), "odzrecwvlwkeekzu", "License Expiration Reminder", "Your license registered with DistillateEx will expire on " + LicenseExpiry + ".", AdminId, Name);
                                     }
                                     else if ((int)DateDiffReader["DateDiff"] == 0)
                                     {
-                                        isSent = obj.SendMail("distillate.lms@gmail.com", oReader["Email"].ToString(), "odzrecwvlwkeekzu", "License Expiration Reminder", "Your license registered with DistillateEx will expire today.", AdminId);
+                                        isSent = obj.SendMail("distillate.lms@gmail.com", oReader["Email"].ToString(), "odzrecwvlwkeekzu", "License Expiration Reminder", "Your license registered with DistillateEx will expire today.", AdminId, Name);
                                     }
                                     else if ((int)DateDiffReader["DateDiff"] < 0)
                                     {
-                                        isSent = obj.SendMail("distillate.lms@gmail.com", oReader["Email"].ToString(), "odzrecwvlwkeekzu", "License Expiration Reminder", "Your license registered with DistillateEx has expired.", AdminId);
+                                        isSent = obj.SendMail("distillate.lms@gmail.com", oReader["Email"].ToString(), "odzrecwvlwkeekzu", "License Expiration Reminder", "Your license registered with DistillateEx has expired.", AdminId, Name);
                                     }
                                 }                                
                             }                         
@@ -102,7 +103,7 @@ namespace DistillateExchangeExe___Send_Mail
             return DateDiffReader;
         }
 
-        public bool SendMail(String FromEmail, string ToEmail, string Password, string Subject, String Body, String AdminId)
+        public bool SendMail(String FromEmail, string ToEmail, string Password, string Subject, String Body, String AdminId, String Name)
         {
             try
             {
@@ -114,6 +115,8 @@ namespace DistillateExchangeExe___Send_Mail
                 message.Subject = Subject;
 
                 StringBuilder body = new();
+                body.AppendLine("Hello " + Name + ",");
+                body.AppendLine();
                 body.AppendLine(Body);
                 body.AppendLine("Please update it immediately to avoid account deactivation.");
                 body.AppendLine("For any further queries contact" + " " + AdminId);
