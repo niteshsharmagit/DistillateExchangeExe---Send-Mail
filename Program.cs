@@ -22,8 +22,9 @@ namespace DistillateExchangeExe___Send_Mail
             {
                 SqlConnection con = new SqlConnection("server=3.20.32.190; database=DistillerExchange; user=sa; password=lms123; Persist Security Info=False; Connect Timeout=25000; MultipleActiveResultSets=True;");
                 con.Open();
-
-                FilePath = @"C:\DxLab - EXE\DistillateExchangeExe - Send Mail"; 
+            
+                 FilePath = @"C:\DotNet\DXLab\DistillateExchangeExe - Send Mail";
+                //FilePath = @"C:\DxLab - EXE\DistillateExchangeExe - Send Mail"; 
                 //FilePath = @"C:\Users\Nitesh Sharma\source\repos\DistillateExchangeExe - Send Mail";
 
                 if (!File.Exists(FilePath + "\\" + "log.txt"))
